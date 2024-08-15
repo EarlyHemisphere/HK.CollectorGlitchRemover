@@ -1,7 +1,6 @@
 ﻿using System.CodeDom;
 using HutongGames.PlayMaker;
 using Modding;
-using Satchel;
 
 namespace CollectorGlitchRemover {
     public class CollectorGlitchRemover : Mod {
