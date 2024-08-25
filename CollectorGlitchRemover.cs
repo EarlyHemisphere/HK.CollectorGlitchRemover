@@ -23,6 +23,12 @@ namespace CollectorGlitchRemover {
             Log("Initialized");
         }
 
+        // This glitch occurs after the collector lands perfectly in a corner of the arena after a jump or grab attack.
+        // It appears that extra FINISHED FSM events are sent, presumably because of entering both the Hop Wall and Hop Land states.
+        // These extra FSM events cause the grab attack Lunge Launch state to be instantly progressed to the Lunge Air state,
+        // where the landing event is triggered before the Collector can jump off the ground.
+        // If this progression is detected, the FSM is reverted back to the launch state, and landing event is removed until collector is
+        // in the air, after which the landing event is added back.
         public void OnUpdate(On.PlayMakerFSM.orig_Update orig, PlayMakerFSM self) {
             orig(self);
 
