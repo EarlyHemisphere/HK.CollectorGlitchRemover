@@ -1,5 +1,5 @@
 # HK.CollectorGlitchRemover
 
-Removes the glitch in the collector fight where the collector does a grab attack without a preceding jump.
+Removes the "insta-grab" and "sticky feet" Collector glitches.
 
 Requires SFCore.
