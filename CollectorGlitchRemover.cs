@@ -31,6 +31,7 @@ namespace CollectorGlitchRemover {
             On.PlayMakerFSM.Update += OnUpdate;
             On.HutongGames.PlayMaker.Fsm.ProcessEvent += OnProcessEvent;
             On.HutongGames.PlayMaker.Fsm.EnterState += OnEnterState;
+            On.HutongGames.PlayMaker.FsmState.OnEnter += OnEnterFsmState;
             // On.PlayMakerFSM.SendEvent += OnSendEvent;
             // On.PlayMakerCollisionEnter2D.OnCollisionEnter2D += OnPlayMakerCollisionEnter2D;
             // On.PlayMakerCollisionStay2D.OnCollisionStay2D += OnPlayMakerCollisionStay2D;
@@ -40,6 +41,15 @@ namespace CollectorGlitchRemover {
             // On.HutongGames.PlayMaker.Fsm.Event_FsmEvent += OnFsmEvent;
 
             Log("Initialized");
+        }
+
+        public void OnEnterFsmState(On.HutongGames.PlayMaker.FsmState.orig_OnEnter orig, FsmState self) {
+            orig(self);
+
+            if (self.Name == "Lunge Air") {
+                Modding.Logger.Log("ActiveActions:");
+                self.ActiveActions.ForEach(action => Modding.Logger.Log(action.GetType()));
+            }
         }
 
         public void OnEnterState(On.HutongGames.PlayMaker.Fsm.orig_EnterState orig, Fsm self, FsmState toState) {
@@ -57,15 +67,18 @@ namespace CollectorGlitchRemover {
 
         public void OnProcessEvent(On.HutongGames.PlayMaker.Fsm.orig_ProcessEvent orig, Fsm self, FsmEvent fsmEvent, FsmEventData eventData) {
             if (self.GameObjectName == "Jar Collector") {
-                Log(fsmEvent.Name);
                 if (fsmEvent.Name == "WALL") {
                     prevEventWasWall = true;
                 } else if (fsmEvent.Name == "LAND") {
                     // Log("DETECTED COMBO");
                     // fsmEvent = null;
                     prevEventWasWall = false;
+                    // Log(new StackTrace());
+                    if (prevState == "Lunge Antic" && stateCounter == 0) {
+                        
+                    }
                 } else if (fsmEvent.Name == "FINISHED" && curStateIsLunge) {
-                    Log(new StackTrace());
+                    // Log(new StackTrace());
                 } else {
                     prevEventWasWall = false;
                 }
