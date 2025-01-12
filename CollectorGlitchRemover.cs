@@ -16,7 +16,7 @@ namespace CollectorGlitchRemover {
         public override void Initialize() {
             Log("Initializing");
 
-            On.PlayMakerFSM.OnEnable += OnEnable;
+            On.HutongGames.PlayMaker.Actions.CheckCollisionSide.OnExit += OnCheckCollisionSideExit;
 
             Log("Initialized");
         }
@@ -31,30 +31,20 @@ namespace CollectorGlitchRemover {
         then performing the next action, sometimes causing loops where Collector keeps trying to hop but doesn't. Always happens
         after the Collector has landed perfectly in the corner after a normal hop.
 
-        Collector landing perfectly in a corner while in a "midair" state on high frame rate is definitely the cause of both
-        these glitches, but I can find no indication in the code and in-game events of this after a good amount of investigation.
-        What is common between these two glitches is that the Collector stays in the "midair" state for only one frame before
-        triggering landing events from the floor that the Collector has presumably not launched off of yet.
+        This glitch happens because the CheckCollisionSide action from the midair states do not properly reset in these scenarios,
+        so the next time the midair state is entered, it acts as though it is still in the previous state it was at when Collector
+        was in the corner of the arena and triggers the landing transition immediately instead of waiting for GameObject collision.
 
-        This mod simply changes the launch events for hop and grab attack jump to be 0.05s waits instead of 1-frame waits, giving
-        Collector enough time to launch off the ground before entering into the "midair" state.
+        Credit to shownyoung for pointing out the real root cause of the issue so I could create this "correct" solution.
         */
-        public void OnEnable(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self) {
+        public void OnCheckCollisionSideExit(On.HutongGames.PlayMaker.Actions.CheckCollisionSide.orig_OnExit orig, CheckCollisionSide self) {
             orig(self);
-            
-            if (self.Fsm.GameObjectName == "Jar Collector" && self.FsmName == "Control") {
-                self.RemoveAction("Lunge Launch", 3);
-                self.AddAction("Lunge Launch", new Wait {
-                    time = 0.05f,
-                    finishEvent = new FsmEvent("FINISHED"),
-                    realTime = false
-                });
-                self.RemoveAction("Hop Start", 12);
-                self.AddAction("Hop Start", new Wait {
-                    time = 0.05f,
-                    finishEvent = new FsmEvent("FINISHED"),
-                    realTime = false
-                });
+
+            if (self.Fsm.GameObjectName == "Jar Collector") {
+                self.topHit = false;
+                self.rightHit = false;
+                self.bottomHit = false;
+                self.leftHit = false;
             }
         }
     }
