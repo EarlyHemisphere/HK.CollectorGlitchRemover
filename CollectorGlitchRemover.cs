@@ -1,4 +1,5 @@
-﻿using HutongGames.PlayMaker;
+﻿using System.Collections;
+using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Modding;
 using SFCore.Utils;
@@ -41,11 +42,17 @@ namespace CollectorGlitchRemover {
             orig(self);
 
             if (self.Fsm.GameObjectName == "Jar Collector") {
-                self.topHit = false;
-                self.rightHit = false;
-                self.bottomHit = false;
-                self.leftHit = false;
+                GameManager.instance.StartCoroutine(ClearCollisions(self));
             }
+        }
+
+        public IEnumerator ClearCollisions(CheckCollisionSide instance) {
+            yield return null; // Wait for one frame to ensure values are no longer being updated
+
+            instance.topHit = false;
+            instance.rightHit = false;
+            instance.bottomHit = false;
+            instance.leftHit = false;
         }
     }
 }
