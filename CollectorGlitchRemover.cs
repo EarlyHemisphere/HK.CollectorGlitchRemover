@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using HutongGames.PlayMaker;
 using HutongGames.PlayMaker.Actions;
 using Modding;
-using SFCore.Utils;
 
 namespace CollectorGlitchRemover {
     public class CollectorGlitchRemover : Mod {
